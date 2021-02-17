@@ -2,21 +2,40 @@
 
 #include "PuzzlePlatformGameInstance.h"
 
+#include "Blueprint/UserWidget.h"
+
 UPuzzlePlatformGameInstance::UPuzzlePlatformGameInstance(const FObjectInitializer& ObjectInitializer) {
 	UE_LOG(LogTemp, Warning, TEXT("GameInstance Constructor"));
+
+	const ConstructorHelpers::FClassFinder<UUserWidget> MainMenuWidgetBP(TEXT("/Game/MenuSystem/WBP_MainMenu")); 
+
+	if(!IsValid(MainMenuWidgetBP.Class)) return;
+
+	MainMenuWidgetClass = MainMenuWidgetBP.Class;
 }
 
 void UPuzzlePlatformGameInstance::Init() {
-	UE_LOG(LogTemp, Warning, TEXT("GameInstance Init"));
+	UE_LOG(LogTemp, Warning, TEXT("Found class %s"), *MainMenuWidgetClass->GetName());
+}
+
+void UPuzzlePlatformGameInstance::LoadMenu() const
+{
+	if(!IsValid(MainMenuWidgetClass)) return;
+	
+	UUserWidget* MainMenu = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
+
+	if(!IsValid(MainMenu)) return;
+
+	MainMenu->AddToViewport();
 }
 
 void UPuzzlePlatformGameInstance::Host() const {
 	GEngine->AddOnScreenDebugMessage(0, 5.f, FColor::Green, TEXT("GameInstance Host"));
 
-	UWorld* world = GetWorld();
-	if (!ensure(world != nullptr)) return;
+	UWorld* World = GetWorld();
+	if (!IsValid(World)) return;
 
-	world->ServerTravel(HostLevel);
+	World->ServerTravel(HostLevel);
 }
 
 void UPuzzlePlatformGameInstance::Join(const FString& Address) const {
