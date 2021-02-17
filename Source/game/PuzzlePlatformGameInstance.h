@@ -3,15 +3,17 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "MenuInterface.h"
 #include "PuzzlePlatformGameInstance.generated.h"
 
 UCLASS()
-class GAME_API UPuzzlePlatformGameInstance final : public UGameInstance
+class GAME_API UPuzzlePlatformGameInstance final : public UGameInstance, public IMenuInterface
 {
 	GENERATED_BODY()
 	
 private:
 	const FString& HostLevel = "/Game/ThirdPersonCPP/Maps/ThirdPersonExampleMap";
+	const FString& JoinURL = "";
 
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 
@@ -20,12 +22,12 @@ public:
 
 	virtual void Init() override;
 
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable, Exec)
 	void LoadMenu() const;
 
 	UFUNCTION(Exec)
-	void Host() const;
+	virtual void Host() override;
 
 	UFUNCTION(Exec)
-	void Join(const FString& Address) const;
+	virtual void Join() override;
 };
